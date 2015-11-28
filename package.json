@@ -1,5 +1,5 @@
 {
-  "name": "redact",
+  "name": "redact-object",
   "version": "1.0.0",
   "description": "Object redactor",
   "main": "index.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/shaunburdick/redact.git"
+    "url": "github.com/shaunburdick/redact-object.git"
   },
   "keywords": [
     "redactor"

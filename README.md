@@ -5,7 +5,7 @@ A javascript object redactor. So I like to output any configurations when my app
 Pass in an object and an array of members you want to redact. It will recursively travel the object redacting any matching members.
 
 ```
-const redact = require('redact');
+const redact = require('redact-object');
 
 var obj = {
   foo: 'bar',
