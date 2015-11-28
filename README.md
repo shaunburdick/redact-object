@@ -1,11 +1,11 @@
-# Redactor
+# Redact
 A javascript object redactor. So I like to output any configurations when my app starts up. Problem is if you have any passwords or other info you don't want in the log you have to clear it out beforehand.
 
 ## Usage
 Pass in an object and an array of members you want to redact. It will recursively travel the object redacting any matching members.
 
 ```
-const redactor = require('redactor');
+const redact = require('redact');
 
 var obj = {
   foo: 'bar',
@@ -25,7 +25,7 @@ var obj = {
  *   }
  * }
  */
-console.dir(redactor(obj), ['foo']);
+console.dir(redact(obj), ['foo']);
 ```
 
 ## Arguments
