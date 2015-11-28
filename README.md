@@ -1,4 +1,4 @@
-# Redact
+# Redact Object
 A javascript object redactor. So I like to output any configurations when my app starts up. Problem is if you have any passwords or other info you don't want in the log you have to clear it out beforehand.
 
 ## Usage
