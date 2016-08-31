@@ -1,6 +1,6 @@
 'use strict';
 
-const extend = require('util')._extend; // yoink
+const assign = require('lodash/assign');
 
 /**
  * Parses an object and redacts any keys listed in keywords
@@ -12,7 +12,7 @@ const extend = require('util')._extend; // yoink
  */
 function redact(target, keywords, replaceVal) {
   const replace = replaceVal || '[ REDACTED ]';
-  const targetCopy = extend({}, target);
+  const targetCopy = assign({}, target);
   for (const x in targetCopy) {
     if (keywords.indexOf(x) > -1) {
       targetCopy[x] = replace;
