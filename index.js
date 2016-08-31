@@ -5,7 +5,7 @@ const isArray = require('lodash/isArray');
 const isPlainObject = require('lodash/isPlainObject');
 const isObject = require('lodash/isObject');
 
-function isKeywordMatch(keywords, key) {
+function isKeywordMatch (keywords, key) {
   return some(keywords, (keyword) =>
     key.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
   );
@@ -19,8 +19,8 @@ function isKeywordMatch(keywords, key) {
  * @param  {string}   replaceVal Optional custom replace value
  * @return {object}              the new redacted object
  */
-function redact(target, keywords, replaceVal) {
-  if ( ! isObject(target)) {
+function redact (target, keywords, replaceVal) {
+  if (!isObject(target)) {
     // If it's not an object then it's a primitive. Nothing to redact.
     return target;
   } else if (isArray(target)) {

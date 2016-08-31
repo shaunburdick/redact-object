@@ -1,3 +1,4 @@
+/* eslint-env node, jasmine */
 'use strict';
 
 const redact = require(process.env.PWD + '/index');
@@ -5,14 +6,14 @@ const redact = require(process.env.PWD + '/index');
 const testConfig = {
   foo: 'bar',
   fizz: {
-    foo: 'bar',
+    foo: 'bar'
   },
   derp: 'poo',
   'auth-token': 'foo',
-  'array': [{ foo: 'bar'}, 5],
+  'array': [{ foo: 'bar' }, 5]
 };
 
-function NonPlainObject() {
+function NonPlainObject () {
 }
 
 const redactVal = '[ REDACTED ]';
@@ -23,7 +24,7 @@ describe('Redact Config', () => {
     expect(redacted.foo).toEqual(redactVal);
     expect(redacted.fizz.foo).toEqual(redactVal);
     expect(Array.isArray(redacted.array)).toBe(true);
-    expect(redacted.array).toEqual([{ foo: redactVal}, 5]);
+    expect(redacted.array).toEqual([{ foo: redactVal }, 5]);
   });
 
   it('should not redact unmatched keys', () => {

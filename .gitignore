@@ -3,3 +3,4 @@ npm-debug.log
 config.*
 .DS_Store
 coverage/
+.nyc_output/

@@ -1,4 +1,7 @@
 # Redact Object
+
+[![Build Status](https://travis-ci.org/shaunburdick/redact-object.svg?branch=master)](https://travis-ci.org/shaunburdick/redact-object) [![Coverage Status](https://coveralls.io/repos/github/shaunburdick/redact-object/badge.svg?branch=master)](https://coveralls.io/github/shaunburdick/redact-object?branch=master) [![npm version](https://badge.fury.io/js/redact-object.svg)](https://badge.fury.io/js/redact-object) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+
 A javascript object redactor. So I like to output any configurations when my app starts up. Problem is if you have any passwords or other info you don't want in the log you have to clear it out beforehand.
 
 ## Usage
@@ -12,7 +15,12 @@ var obj = {
   fizz: {
     foo: 'oof',
     key: 'value'
-  }
+  },
+  buzz: [
+    // it can do arrays too
+    { foo: 'bar' },
+    22
+  ]
 };
 
 /**
@@ -22,7 +30,12 @@ var obj = {
  *   fizz: {
  *     foo: '[ REDACTED ]',
  *     key: 'value'
- *   }
+ *   },
+ *   buzz: [
+ *     // it can do arrays too
+ *     { foo: 'bar' },
+ *     22
+ *   ]
  * }
  */
 console.dir(redact(obj), ['foo']);
@@ -38,6 +51,5 @@ console.dir(redact(obj), ['foo']);
 2. Add failing tests for the change you want to make. Run `npm test` to see the tests fail.
 3. Fix stuff.
 4. Run `npm test` to see if the tests pass. Repeat steps 2-4 until done.
-5. Check code coverage `npm run coverage` and add test paths as needed.
-6. Update the documentation to reflect any changes.
-7. Push to your fork and submit a pull request.
+5. Update the documentation to reflect any changes.
+6. Push to your fork and submit a pull request.
