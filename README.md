@@ -45,6 +45,9 @@ console.dir(redact(obj), ['foo']);
 - {object}   target     The target object to scan for redactable items
 - {string[]} keywords   A list of members to redact
 - {string}   replaceVal Optional custom replace value
+- {object}   config     Option object of config settings:
+  - partial: boolean, will do partial matching if true, Default _true_
+  - strict:  boolean, will do strict comparison (case insensitive) if true, Default _true_
 
 ## Contributing
 1. Create a new branch, please don't work in master directly.

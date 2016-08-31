@@ -20,6 +20,9 @@
     "redactor"
   ],
   "author": "Shaun Buridck <github@shaunburdick.com>",
+  "contributors": [
+    "Parsha Pourkhomami <parshap@gmail.com>"
+  ],
   "license": "ISC",
   "devDependencies": {
     "coveralls": "^2.11.12",

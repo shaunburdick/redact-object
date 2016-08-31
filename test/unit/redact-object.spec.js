@@ -44,13 +44,25 @@ describe('Redact Config', () => {
     expect(testConfig.foo).toEqual(origValue);
   });
 
-  it('match partial strings', () => {
+  it('should match partial strings', () => {
     const redacted = redact(testConfig, ['token']);
     expect(redacted['auth-token']).toEqual(redactVal);
   });
 
-  it('should be case-insensitive', () => {
+  it('should not match partial strings if configured', () => {
+    const origValue = testConfig['auth-token'];
+    const redacted = redact(testConfig, ['token'], redactVal, { partial: false });
+    expect(redacted['auth-token']).toEqual(origValue);
+  });
+
+  it('should be case-sensitive', () => {
+    const origValue = testConfig.foo;
     const redacted = redact(testConfig, ['FOO']);
+    expect(redacted.foo).toEqual(origValue);
+  });
+
+  it('should be case-insensitive if configured', () => {
+    const redacted = redact(testConfig, ['FOO'], redactVal, { strict: false });
     expect(redacted.foo).toEqual(redactVal);
     expect(redacted.fizz.foo).toEqual(redactVal);
   });
