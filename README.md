@@ -47,7 +47,7 @@ console.dir(redact(obj), ['foo']);
 - {string}   replaceVal Optional custom replace value
 - {object}   config     Option object of config settings:
   - partial: boolean, will do partial matching if true, Default _true_
-  - strict:  boolean, will do strict comparison (case insensitive) if true, Default _true_
+  - strict:  boolean, will do strict comparison (case sensitive) if true, Default _true_
 
 ## Contributing
 1. Create a new branch, please don't work in master directly.
