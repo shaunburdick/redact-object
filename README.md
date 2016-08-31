@@ -33,7 +33,7 @@ var obj = {
  *   },
  *   buzz: [
  *     // it can do arrays too
- *     { foo: 'bar' },
+ *     { foo: '[ REDACTED ]' },
  *     22
  *   ]
  * }
