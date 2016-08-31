@@ -17,7 +17,7 @@ function redact(target, keywords, replaceVal) {
     if (keywords.indexOf(x) > -1) {
       targetCopy[x] = replace;
     } else if (targetCopy[x] === Object(targetCopy[x])) {
-      targetCopy[x] = redact(targetCopy[x], keywords);
+      targetCopy[x] = redact(targetCopy[x], keywords, replaceVal);
     }
   }
 
