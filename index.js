@@ -1,6 +1,11 @@
 'use strict';
 
 const assign = require('lodash/assign');
+const some = require('lodash/some');
+
+function isKeywordMatch(keywords, key) {
+  return some(keywords, (keyword) => key.indexOf(keyword) !== -1);
+}
 
 /**
  * Parses an object and redacts any keys listed in keywords
@@ -14,7 +19,8 @@ function redact(target, keywords, replaceVal) {
   const replace = replaceVal || '[ REDACTED ]';
   const targetCopy = assign({}, target);
   for (const x in targetCopy) {
-    if (keywords.indexOf(x) > -1) {
+    const isMatch = isKeywordMatch(keywords, x);
+    if (isMatch) {
       targetCopy[x] = replace;
     } else if (targetCopy[x] === Object(targetCopy[x])) {
       targetCopy[x] = redact(targetCopy[x], keywords, replaceVal);

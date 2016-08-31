@@ -8,6 +8,7 @@ const testConfig = {
     foo: 'bar',
   },
   derp: 'poo',
+  'auth-token': 'foo',
 };
 
 const redactVal = '[ REDACTED ]';
@@ -34,5 +35,10 @@ describe('Redact Config', () => {
     const origValue = testConfig.foo;
     redact(testConfig, ['foo']);
     expect(testConfig.foo).toEqual(origValue);
+  });
+
+  it('match partial strings', () => {
+    const redacted = redact(testConfig, ['token']);
+    expect(redacted['auth-token']).toEqual(redactVal);
   });
 });
