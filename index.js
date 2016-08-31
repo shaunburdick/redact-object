@@ -3,6 +3,7 @@
 const assign = require('lodash/assign');
 const some = require('lodash/some');
 const isArray = require('lodash/isArray');
+const isObject = require('lodash/isObject');
 
 function isKeywordMatch(keywords, key) {
   return some(keywords, (keyword) =>
@@ -21,7 +22,7 @@ function isKeywordMatch(keywords, key) {
 function redact(target, keywords, replaceVal) {
   if (isArray(target)) {
     return target.map((val) => {
-      if (val === Object(val)) {
+      if (isObject(val))
         return redact(val, keywords, replaceVal);
       }
       return val;
@@ -34,7 +35,7 @@ function redact(target, keywords, replaceVal) {
     const isMatch = isKeywordMatch(keywords, x);
     if (isMatch) {
       targetCopy[x] = replace;
-    } else if (targetCopy[x] === Object(targetCopy[x])) {
+    } else if (isObject(targetCopy[x]))
       targetCopy[x] = redact(targetCopy[x], keywords, replaceVal);
     }
   }
