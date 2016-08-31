@@ -9,6 +9,7 @@ const testConfig = {
   },
   derp: 'poo',
   'auth-token': 'foo',
+  'array': [{ foo: 'bar'}, 5],
 };
 
 const redactVal = '[ REDACTED ]';
@@ -18,6 +19,8 @@ describe('Redact Config', () => {
     const redacted = redact(testConfig, ['foo']);
     expect(redacted.foo).toEqual(redactVal);
     expect(redacted.fizz.foo).toEqual(redactVal);
+    expect(Array.isArray(redacted.array)).toBe(true);
+    expect(redacted.array).toEqual([{ foo: redactVal}, 5]);
   });
 
   it('should not redact unmatched keys', () => {
