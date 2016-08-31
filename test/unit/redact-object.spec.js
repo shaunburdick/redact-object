@@ -41,4 +41,10 @@ describe('Redact Config', () => {
     const redacted = redact(testConfig, ['token']);
     expect(redacted['auth-token']).toEqual(redactVal);
   });
+
+  it('should be case-insensitive', () => {
+    const redacted = redact(testConfig, ['FOO']);
+    expect(redacted.foo).toEqual(redactVal);
+    expect(redacted.fizz.foo).toEqual(redactVal);
+  });
 });

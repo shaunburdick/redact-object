@@ -4,7 +4,9 @@ const assign = require('lodash/assign');
 const some = require('lodash/some');
 
 function isKeywordMatch(keywords, key) {
-  return some(keywords, (keyword) => key.indexOf(keyword) !== -1);
+  return some(keywords, (keyword) =>
+    key.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+  );
 }
 
 /**
