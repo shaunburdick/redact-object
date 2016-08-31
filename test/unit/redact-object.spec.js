@@ -12,6 +12,9 @@ const testConfig = {
   'array': [{ foo: 'bar'}, 5],
 };
 
+function NonPlainObject() {
+}
+
 const redactVal = '[ REDACTED ]';
 
 describe('Redact Config', () => {
@@ -49,5 +52,12 @@ describe('Redact Config', () => {
     const redacted = redact(testConfig, ['FOO']);
     expect(redacted.foo).toEqual(redactVal);
     expect(redacted.fizz.foo).toEqual(redactVal);
+  });
+
+  it('should throw with non-plain object', () => {
+    expect(() => {
+      const nonPlainObject = new NonPlainObject();
+      redact(nonPlainObject, ['FOO']);
+    }).toThrow();
   });
 });
