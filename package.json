@@ -28,5 +28,8 @@
     "istanbul": "^0.4.1",
     "jasmine-node": "^1.14.5"
   },
-  "homepage": "https://github.com/shaunburdick/redact-object"
+  "homepage": "https://github.com/shaunburdick/redact-object",
+  "dependencies": {
+    "lodash": "^4.15.0"
+  }
 }

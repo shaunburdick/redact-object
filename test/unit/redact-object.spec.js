@@ -8,7 +8,12 @@ const testConfig = {
     foo: 'bar',
   },
   derp: 'poo',
+  'auth-token': 'foo',
+  'array': [{ foo: 'bar'}, 5],
 };
+
+function NonPlainObject() {
+}
 
 const redactVal = '[ REDACTED ]';
 
@@ -17,6 +22,8 @@ describe('Redact Config', () => {
     const redacted = redact(testConfig, ['foo']);
     expect(redacted.foo).toEqual(redactVal);
     expect(redacted.fizz.foo).toEqual(redactVal);
+    expect(Array.isArray(redacted.array)).toBe(true);
+    expect(redacted.array).toEqual([{ foo: redactVal}, 5]);
   });
 
   it('should not redact unmatched keys', () => {
@@ -34,5 +41,23 @@ describe('Redact Config', () => {
     const origValue = testConfig.foo;
     redact(testConfig, ['foo']);
     expect(testConfig.foo).toEqual(origValue);
+  });
+
+  it('match partial strings', () => {
+    const redacted = redact(testConfig, ['token']);
+    expect(redacted['auth-token']).toEqual(redactVal);
+  });
+
+  it('should be case-insensitive', () => {
+    const redacted = redact(testConfig, ['FOO']);
+    expect(redacted.foo).toEqual(redactVal);
+    expect(redacted.fizz.foo).toEqual(redactVal);
+  });
+
+  it('should throw with non-plain object', () => {
+    expect(() => {
+      const nonPlainObject = new NonPlainObject();
+      redact(nonPlainObject, ['FOO']);
+    }).toThrow();
   });
 });

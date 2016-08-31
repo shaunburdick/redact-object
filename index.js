@@ -1,6 +1,15 @@
 'use strict';
 
-const extend = require('util')._extend; // yoink
+const some = require('lodash/some');
+const isArray = require('lodash/isArray');
+const isPlainObject = require('lodash/isPlainObject');
+const isObject = require('lodash/isObject');
+
+function isKeywordMatch(keywords, key) {
+  return some(keywords, (keyword) =>
+    key.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+  );
+}
 
 /**
  * Parses an object and redacts any keys listed in keywords
@@ -11,17 +20,26 @@ const extend = require('util')._extend; // yoink
  * @return {object}              the new redacted object
  */
 function redact(target, keywords, replaceVal) {
-  const replace = replaceVal || '[ REDACTED ]';
-  const targetCopy = extend({}, target);
-  for (const x in targetCopy) {
-    if (keywords.indexOf(x) > -1) {
-      targetCopy[x] = replace;
-    } else if (targetCopy[x] === Object(targetCopy[x])) {
-      targetCopy[x] = redact(targetCopy[x], keywords);
-    }
+  if ( ! isObject(target)) {
+    // If it's not an object then it's a primitive. Nothing to redact.
+    return target;
+  } else if (isArray(target)) {
+    // Create a new array with each value having been redacted
+    // Redact each value of the array.
+    return target.map((val) => redact(val, keywords, replaceVal));
+  } else if (isPlainObject(target)) {
+    return Object.keys(target).reduce((newObj, key) => {
+      const isMatch = isKeywordMatch(keywords, key);
+      if (isMatch) {
+        newObj[key] = replaceVal || '[ REDACTED ]';
+      } else {
+        newObj[key] = redact(target[key], keywords, replaceVal);
+      }
+      return newObj;
+    }, {});
   }
-
-  return targetCopy;
+  // Redaction only works on arrays, plain objects, and primitives.
+  throw new Error('Unsupported value for redaction');
 }
 
 module.exports = redact;
