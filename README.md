@@ -5,9 +5,10 @@
 A javascript object redactor. So I like to output any configurations when my app starts up. Problem is if you have any passwords or other info you don't want in the log you have to clear it out beforehand.
 
 ## Usage
+
 Pass in an object and an array of members you want to redact. It will recursively travel the object redacting any matching members.
 
-```
+```javascript
 const redact = require('redact-object');
 
 var obj = {
@@ -38,18 +39,49 @@ var obj = {
  *   ]
  * }
  */
-console.dir(redact(obj), ['foo']);
+console.dir(redact(obj, ['foo']));
 ```
 
 ## Arguments
-- {object}   target     The target object to scan for redactable items
-- {string[]} keywords   A list of members to redact
-- {string}   replaceVal Optional custom replace value
-- {object}   config     Option object of config settings:
+
+- {object}          `target`     The target object to scan for redactable items
+- {string[]}        `keywords`   A list of members to redact
+- {string|Function} `replaceVal` Optional custom replace value, or function that returns replace value. Default value is **[ REDACTED ]**
+- {object}          `config`     Option object of config settings:
   - partial: boolean, will do partial matching if true, Default _true_
   - strict:  boolean, will do strict comparison (case sensitive) if true, Default _true_
 
+### Replace Function
+
+`replaceVal` can be a function. This function will get two arguments `(value, key)`:
+
+- `value`: The value of the object
+- `key`: The matched key
+
+Your function's return will replace the value on the new object
+
+#### Example
+
+```javascript
+const obj = {
+   firstname: 'Han',
+   lastname: 'Solo',
+};
+
+const replacer =  val => `[ REDACTED (${val.length}) ]`;
+const redacted = redact(obj, ['firstname', 'lastname'], replacer);
+
+/**
+ * Results in:
+ * {
+ *   firstname: '[ REDACTED (3) ]',
+ *   lastname: '[ REDACTED (4) ]',
+ * };
+ */
+```
+
 ## Contributing
+
 1. Create a new branch, please don't work in master directly.
 2. Add failing tests for the change you want to make. Run `npm test` to see the tests fail.
 3. Fix stuff.

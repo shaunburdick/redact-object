@@ -10,11 +10,12 @@ const testConfig = {
   },
   derp: 'poo',
   'auth-token': 'foo',
-  'array': [{ foo: 'bar' }, 5]
+  'array': [{
+    foo: 'bar'
+  }, 5]
 };
 
-function NonPlainObject () {
-}
+function NonPlainObject () {}
 
 const redactVal = '[ REDACTED ]';
 
@@ -24,7 +25,9 @@ describe('Redact Config', () => {
     expect(redacted.foo).toEqual(redactVal);
     expect(redacted.fizz.foo).toEqual(redactVal);
     expect(Array.isArray(redacted.array)).toBe(true);
-    expect(redacted.array).toEqual([{ foo: redactVal }, 5]);
+    expect(redacted.array).toEqual([{
+      foo: redactVal
+    }, 5]);
   });
 
   it('should not redact unmatched keys', () => {
@@ -51,7 +54,9 @@ describe('Redact Config', () => {
 
   it('should not match partial strings if configured', () => {
     const origValue = testConfig['auth-token'];
-    const redacted = redact(testConfig, ['token'], redactVal, { partial: false });
+    const redacted = redact(testConfig, ['token'], redactVal, {
+      partial: false
+    });
     expect(redacted['auth-token']).toEqual(origValue);
   });
 
@@ -62,7 +67,9 @@ describe('Redact Config', () => {
   });
 
   it('should be case-insensitive if configured', () => {
-    const redacted = redact(testConfig, ['FOO'], redactVal, { strict: false });
+    const redacted = redact(testConfig, ['FOO'], redactVal, {
+      strict: false
+    });
     expect(redacted.foo).toEqual(redactVal);
     expect(redacted.fizz.foo).toEqual(redactVal);
   });
@@ -72,5 +79,10 @@ describe('Redact Config', () => {
       const nonPlainObject = new NonPlainObject();
       redact(nonPlainObject, ['FOO']);
     }).toThrow();
+  });
+
+  it('should accept a function to replace value', () => {
+    const redacted = redact(testConfig, ['foo'], (value, key) => `Redacted (${value.length})`);
+    expect(redacted.foo).toEqual('Redacted (3)');
   });
 });
