@@ -4,8 +4,10 @@
   "description": "Object redactor",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "index.d.ts"
   ],
+  "typings": "index.d.ts",
   "scripts": {
     "test": "npm run lint && npm run unit",
     "lint": "semistandard --verbose | snazzy",

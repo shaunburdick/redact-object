@@ -1,7 +1,7 @@
 /* eslint-env node, jasmine */
 'use strict';
 
-const redact = require(process.env.PWD + '/index');
+const redact = require('../../index');
 
 const testConfig = {
   foo: 'bar',
