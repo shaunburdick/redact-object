@@ -48,8 +48,9 @@ console.dir(redact(obj, ['foo']));
 - {string[]}        `keywords`   A list of members to redact
 - {string|Function} `replaceVal` Optional custom replace value, or function that returns replace value. Default value is **[ REDACTED ]**
 - {object}          `config`     Option object of config settings:
-  - partial: boolean, will do partial matching if true, Default _true_
+  - partial: boolean, will do partial matching if true, Default _false_
   - strict:  boolean, will do strict comparison (case sensitive) if true, Default _true_
+  - ignoreUnknown:  boolean, will do strict comparison (case sensitive) if true, Default _false_
 
 ### Replace Function
 
