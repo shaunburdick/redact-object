@@ -81,6 +81,14 @@ describe('Redact Config', () => {
     }).toThrow();
   });
 
+  it('should not throw with function and `ignoreFunctions` is true', () => {
+    const func = () => undefined;
+    const redacted = redact(func, ['FOO'], 'REDACTED', {
+      ignoreFunctions: true
+    });
+    expect(redacted).toEqual(func);
+  });
+
   it('should accept a function to replace value', () => {
     const redacted = redact(testConfig, ['foo'], (value, key) => `Redacted (${value.length})`);
     expect(redacted.foo).toEqual('Redacted (3)');

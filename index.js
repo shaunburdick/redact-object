@@ -8,13 +8,17 @@ function isObject (value) {
   return value != null && (type === 'object' || type === 'function');
 }
 
+function isFunction (value) {
+  return typeof value === 'function';
+}
+
 /**
  * Checks for match
  * @param  {string[]} keywords A list of keywords to look for
  * @param  {string}   key      The string to check
- * @param  {Boolean}  strict   Use strict case if true
- * @param  {Boolean}  partial  Use partial matching if true
- * @return {Boolean}           True for match or false
+ * @param  {boolean}  strict   Use strict case if true
+ * @param  {boolean}  partial  Use partial matching if true
+ * @return {boolean}           True for match or false
  */
 function isKeywordMatch (keywords, key, strict, partial) {
   return keywords.some(keyword => {
@@ -37,6 +41,7 @@ function isKeywordMatch (keywords, key, strict, partial) {
  *                                        {
  *                                          partial: boolean, do partial matches, default false
  *                                          strict: boolean, do strict key matching, default true
+ *                                          ignoreFunctions: boolean, ignore functions instead of error, default false
  *                                        }
  * @return {object}                       the new redacted object
  */
@@ -44,6 +49,7 @@ function redact (target, keywords, replaceVal, config) {
   config = config || {};
   const partial = config.hasOwnProperty('partial') ? config.partial : true;
   const strict = config.hasOwnProperty('strict') ? config.strict : true;
+  const ignoreFunctions = config.hasOwnProperty('ignoreFunctions') ? config.ignoreFunctions : false;
 
   if (!isObject(target)) {
     // If it's not an object then it's a primitive. Nothing to redact.
@@ -67,7 +73,12 @@ function redact (target, keywords, replaceVal, config) {
     }, {});
   }
   // Redaction only works on arrays, plain objects, and primitives.
-  throw new Error('Unsupported value for redaction');
+  if (isFunction(target) && ignoreFunctions) {
+    // ignore the function instead of throwing an error
+    return target;
+  } else {
+    throw new Error('Unsupported value for redaction');
+  }
 }
 
 module.exports = redact;
