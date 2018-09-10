@@ -81,10 +81,10 @@ describe('Redact Config', () => {
     }).toThrow();
   });
 
-  it('should not throw with function and `ignoreFunctions` is true', () => {
+  it('should not throw with function and `ignoreUnknown` is true', () => {
     const func = () => undefined;
     const redacted = redact(func, ['FOO'], 'REDACTED', {
-      ignoreFunctions: true
+      ignoreUnknown: true
     });
     expect(redacted).toEqual(func);
   });

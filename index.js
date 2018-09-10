@@ -8,10 +8,6 @@ function isObject (value) {
   return value != null && (type === 'object' || type === 'function');
 }
 
-function isFunction (value) {
-  return typeof value === 'function';
-}
-
 /**
  * Checks for match
  * @param  {string[]} keywords A list of keywords to look for
@@ -41,7 +37,7 @@ function isKeywordMatch (keywords, key, strict, partial) {
  *                                        {
  *                                          partial: boolean, do partial matches, default false
  *                                          strict: boolean, do strict key matching, default true
- *                                          ignoreFunctions: boolean, ignore functions instead of error, default false
+ *                                          ignoreUnknown: boolean, ignore unknown types instead of error, default false
  *                                        }
  * @return {object}                       the new redacted object
  */
@@ -49,7 +45,7 @@ function redact (target, keywords, replaceVal, config) {
   config = config || {};
   const partial = config.hasOwnProperty('partial') ? config.partial : true;
   const strict = config.hasOwnProperty('strict') ? config.strict : true;
-  const ignoreFunctions = config.hasOwnProperty('ignoreFunctions') ? config.ignoreFunctions : false;
+  const ignoreUnknown = config.hasOwnProperty('ignoreUnknown') ? config.ignoreUnknown : false;
 
   if (!isObject(target)) {
     // If it's not an object then it's a primitive. Nothing to redact.
@@ -73,8 +69,8 @@ function redact (target, keywords, replaceVal, config) {
     }, {});
   }
   // Redaction only works on arrays, plain objects, and primitives.
-  if (isFunction(target) && ignoreFunctions) {
-    // ignore the function instead of throwing an error
+  if (ignoreUnknown) {
+    // ignore the unknown type instead of throwing an error
     return target;
   } else {
     throw new Error('Unsupported value for redaction');
