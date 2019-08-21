@@ -20,11 +20,9 @@ export type ReplaceFunction = (value: any, key: string) => string;
  * @param  {ConfigOptions}            config     Optional config
  * @return {object}                              the new redacted object
  */
-function redact(
+export default function redact(
   target: any,
   keywords: string[],
   replaceVal?: string | ReplaceFunction,
   config?: ConfigOptions
 ): any;
-
-export = redact;
