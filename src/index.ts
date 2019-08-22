@@ -1,29 +1,38 @@
-'use strict';
+import isPlainObject from 'lodash.isplainobject';
 
-const isPlainObject = require('lodash.isplainobject');
+export type ReplaceFunction = (value: any, key: string) => string;
+
+export interface ConfigOptions {
+  // do partial matches, default false
+  partial?: boolean;
+
+  // do strict key matching, default true
+  strict?: boolean;
+
+  // ignore unknown types instead of error, default false
+  ignoreUnknown?: boolean;
+}
 
 // Yoinked from lodash to save dependencies
-function isObject (value) {
+function isObject(value: any): value is { [key: string]: any } {
   const type = typeof value;
   return value != null && (type === 'object' || type === 'function');
 }
 
 /**
  * Checks for match
- * @param  {string[]} keywords A list of keywords to look for
- * @param  {string}   key      The string to check
- * @param  {boolean}  strict   Use strict case if true
- * @param  {boolean}  partial  Use partial matching if true
- * @return {boolean}           True for match or false
+ * @param  keywords A list of keywords to look for
+ * @param  key      The string to check
+ * @param  strict   Use strict case if true
+ * @param  partial  Use partial matching if true
+ * @return          True for match or false
  */
-function isKeywordMatch (keywords, key, strict, partial) {
+function isKeywordMatch(keywords: string[], key: string, strict = false, partial = false): boolean {
   return keywords.some(keyword => {
     const keyMatch = strict ? key : key.toLowerCase();
     const keywordMatch = strict ? keyword : keyword.toLowerCase();
 
-    return partial
-      ? keyMatch.indexOf(keywordMatch) !== -1
-      : keyMatch === keywordMatch;
+    return partial ? keyMatch.indexOf(keywordMatch) !== -1 : keyMatch === keywordMatch;
   });
 }
 
@@ -41,7 +50,12 @@ function isKeywordMatch (keywords, key, strict, partial) {
  *                                        }
  * @return {object}                       the new redacted object
  */
-function redact (target, keywords, replaceVal, config) {
+export default function redact(
+  target: unknown,
+  keywords: string[],
+  replaceVal?: string | ReplaceFunction,
+  config?: ConfigOptions
+): any {
   config = config || {};
   const partial = config.hasOwnProperty('partial') ? config.partial : true;
   const strict = config.hasOwnProperty('strict') ? config.strict : true;
@@ -55,18 +69,18 @@ function redact (target, keywords, replaceVal, config) {
     // Redact each value of the array.
     return target.map(val => redact(val, keywords, replaceVal, config));
   } else if (isPlainObject(target)) {
-    return Object.keys(target).reduce((newObj, key) => {
-      const isMatch = isKeywordMatch(keywords, key, strict, partial);
-      if (isMatch) {
-        newObj[key] =
-          typeof replaceVal === 'function'
-            ? replaceVal(target[key], key)
-            : replaceVal || '[ REDACTED ]';
-      } else {
-        newObj[key] = redact(target[key], keywords, replaceVal, config);
-      }
-      return newObj;
-    }, {});
+    return Object.keys(target).reduce(
+      (newObj, key) => {
+        const isMatch = isKeywordMatch(keywords, key, strict, partial);
+        if (isMatch) {
+          newObj[key] = typeof replaceVal === 'function' ? replaceVal(target[key], key) : replaceVal || '[ REDACTED ]';
+        } else {
+          newObj[key] = redact(target[key], keywords, replaceVal, config);
+        }
+        return newObj;
+      },
+      <{ [key: string]: any }>{}
+    );
   }
   // Redaction only works on arrays, plain objects, and primitives.
   if (ignoreUnknown) {
@@ -76,5 +90,3 @@ function redact (target, keywords, replaceVal, config) {
     throw new Error('Unsupported value for redaction');
   }
 }
-
-module.exports = redact;

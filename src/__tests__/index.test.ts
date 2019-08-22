@@ -1,7 +1,4 @@
-/* eslint-env node, jasmine */
-'use strict';
-
-const redact = require('../../index');
+import redact from '..';
 
 const testConfig = {
   foo: 'bar',
@@ -10,12 +7,15 @@ const testConfig = {
   },
   derp: 'poo',
   'auth-token': 'foo',
-  'array': [{
-    foo: 'bar'
-  }, 5]
+  array: [
+    {
+      foo: 'bar'
+    },
+    5
+  ]
 };
 
-function NonPlainObject () {}
+class NonPlainObject {}
 
 const redactVal = '[ REDACTED ]';
 
@@ -25,9 +25,12 @@ describe('Redact Config', () => {
     expect(redacted.foo).toEqual(redactVal);
     expect(redacted.fizz.foo).toEqual(redactVal);
     expect(Array.isArray(redacted.array)).toBe(true);
-    expect(redacted.array).toEqual([{
-      foo: redactVal
-    }, 5]);
+    expect(redacted.array).toEqual([
+      {
+        foo: redactVal
+      },
+      5
+    ]);
   });
 
   it('should not redact unmatched keys', () => {
@@ -41,7 +44,7 @@ describe('Redact Config', () => {
     expect(redacted.foo).toEqual(customVal);
   });
 
-  it('should not alter orignal object', () => {
+  it('should not alter original object', () => {
     const origValue = testConfig.foo;
     redact(testConfig, ['foo']);
     expect(testConfig.foo).toEqual(origValue);
