@@ -1,6 +1,6 @@
 {
   "name": "redact-object",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Object redactor",
   "main": "dist/index.js",
   "files": [
