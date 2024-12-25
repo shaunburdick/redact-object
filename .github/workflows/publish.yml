@@ -1,0 +1,43 @@
+---
+    name: Publish
+
+    on:
+        push:
+            branches: ["main"]
+
+    jobs:
+        test:
+            name: Test Package
+            runs-on: ubuntu-latest
+
+            steps:
+                - uses: actions/checkout@v4
+                - name: Use Node.js
+                  uses: actions/setup-node@v4
+                  with:
+                      node-version: 20
+                      cache: "npm"
+                      cache-dependency-path: package-lock.json
+                - run: npm ci
+                - run: npm test
+
+        publish:
+            name: Publish Library
+            needs: test
+            runs-on: ubuntu-latest
+
+            steps:
+                - uses: actions/checkout@v4
+                - uses: actions/setup-node@v4
+                  with:
+                    node-version: 20
+                    cache: "npm"
+                    cache-dependency-path: package-lock.json
+                - run: npm ci
+                - id: publish
+                  uses: JS-DevTools/npm-publish@v3
+                  with:
+                    token: ${{ secrets.GH_J2S_NPM_TOKEN }}
+                - if: ${{ steps.publish.outputs.type }}
+                  run: |
+                    echo "Version changed! Published ${{ steps.publish.outputs.type }} version: ${{ steps.publish.outputs.id  }}"
