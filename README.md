@@ -1,6 +1,6 @@
 # Redact Object
 
-[![Build Status](https://travis-ci.org/shaunburdick/redact-object.svg?branch=master)](https://travis-ci.org/shaunburdick/redact-object) [![Coverage Status](https://coveralls.io/repos/github/shaunburdick/redact-object/badge.svg?branch=master)](https://coveralls.io/github/shaunburdick/redact-object?branch=master) [![npm version](https://badge.fury.io/js/redact-object.svg)](https://badge.fury.io/js/redact-object) [![js-semistandard-style](https://img.shields.io/badge/code%20style-semistandard-brightgreen.svg?style=flat-square)](https://github.com/Flet/semistandard)
+[![Build Status](https://travis-ci.org/shaunburdick/redact-object.svg?branch=main)](https://travis-ci.org/shaunburdick/redact-object) [![Coverage Status](https://coveralls.io/repos/github/shaunburdick/redact-object/badge.svg?branch=main)](https://coveralls.io/github/shaunburdick/redact-object?branch=main) [![npm version](https://badge.fury.io/js/redact-object.svg)](https://badge.fury.io/js/redact-object)
 
 A javascript object redactor. So I like to output any configurations when my app starts up. Problem is if you have any passwords or other info you don't want in the log you have to clear it out beforehand.
 
@@ -48,7 +48,7 @@ console.dir(redact(obj, ['foo']));
 - {string[]}        `keywords`   A list of members to redact
 - {string|Function} `replaceVal` Optional custom replace value, or function that returns replace value. Default value is **[ REDACTED ]**
 - {object}          `config`     Option object of config settings:
-  - partial: boolean, will do partial matching if true, Default _false_
+  - partial: boolean, will do partial matching if true, Default _true_
   - strict:  boolean, will do strict comparison (case sensitive) if true, Default _true_
   - ignoreUnknown:  boolean, will do strict comparison (case sensitive) if true, Default _false_
 
