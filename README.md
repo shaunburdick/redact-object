@@ -1,6 +1,6 @@
 # Redact Object
 
-[![Build Status](https://travis-ci.org/shaunburdick/redact-object.svg?branch=main)](https://travis-ci.org/shaunburdick/redact-object) [![Coverage Status](https://coveralls.io/repos/github/shaunburdick/redact-object/badge.svg?branch=main)](https://coveralls.io/github/shaunburdick/redact-object?branch=main) [![npm version](https://badge.fury.io/js/redact-object.svg)](https://badge.fury.io/js/redact-object)
+[![npm version](https://badge.fury.io/js/redact-object.svg)](https://badge.fury.io/js/redact-object)  [![Build Status](https://github.com/shaunburdick/redact-object/actions/workflows/test.yml/badge.svg)](https://github.com/shaunburdick/redact-object/actions/workflows/test.yml)
 
 A javascript object redactor. So I like to output any configurations when my app starts up. Problem is if you have any passwords or other info you don't want in the log you have to clear it out beforehand.
 
