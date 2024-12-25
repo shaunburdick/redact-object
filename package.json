@@ -15,8 +15,7 @@
     "lint:fix": "npm run lint -- --fix",
     "build": "npm run build:clean && npm run build:transpile",
     "build:clean": "rimraf dist/*",
-    "build:transpile": "tsc --project tsconfig.build.json",
-    "coverage": "coveralls < coverage/lcov.info "
+    "build:transpile": "tsc --project tsconfig.build.json"
   },
   "repository": {
     "type": "git",
@@ -47,15 +46,5 @@
   "homepage": "https://github.com/shaunburdick/redact-object",
   "dependencies": {
     "lodash.isplainobject": "^4.0.6"
-  },
-  "semistandard": {
-    "ignore": [
-      "coverage"
-    ]
-  },
-  "nyc": {
-    "include": [
-      "index.js"
-    ]
   }
 }
