@@ -83,7 +83,7 @@ describe('Redact Config', () => {
         expect(() => {
             const nonPlainObject = new NonPlainObject();
             redact(nonPlainObject, ['FOO']);
-        }).toThrow();
+        }).toThrow('Unsupported value type for redaction: object (not plain)');
     });
 
     it('should not throw with function and `ignoreUnknown` is true', () => {

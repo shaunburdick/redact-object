@@ -41,16 +41,16 @@ function isKeywordMatch(keywords: string[], key: string, strict = false, partial
 /**
  * Parses an object and redacts any keys listed in keywords
  *
- * @param  {object}            target     The target object to scan for redactable items
- * @param  {string[]}          keywords   A list of members to redact
- * @param  {string|function}   replaceVal Optional custom replace value or function replacer
- * @param  {object}            config     Optional config
- *                                        {
- *                                          partial: boolean, do partial matches, default false
- *                                          strict: boolean, do strict key matching, default true
- *                                          ignoreUnknown: boolean, ignore unknown types instead of error, default false
- *                                        }
- * @return {object}                       the new redacted object
+ * @param  target     The target object to scan for redactable items
+ * @param  keywords   A list of members to redact
+ * @param  replaceVal Optional custom replace value or function replacer
+ * @param  config     Optional config
+ *                             {
+ *                               partial: boolean, do partial matches, default false
+ *                               strict: boolean, do strict key matching, default true
+ *                               ignoreUnknown: boolean, ignore unknown types instead of error, default false
+ *                             }
+ * @return            the new redacted object
  */
 export default function redact(
     target: any,
@@ -90,6 +90,10 @@ export default function redact(
     // ignore the unknown type instead of throwing an error
         return target;
     } else {
-        throw new Error('Unsupported value for redaction');
+        let targetType = typeof target;
+        if (targetType === 'object' && !isPlainObject(target)) {
+            targetType += ' (not plain)';
+        }
+        throw new Error(`Unsupported value type for redaction: ${targetType}`);
     }
 }
