@@ -32,6 +32,9 @@
     "Parsha Pourkhomami <parshap@gmail.com>"
   ],
   "license": "ISC",
+  "engines": {
+    "node": "^20.9.0 || >=22.0.0"
+  },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/lodash.isplainobject": "^4.0.9",

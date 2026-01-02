@@ -151,7 +151,7 @@ Prefer `map`, `reduce`, `filter` over imperative loops for immutable transformat
 - TypeScript 5.9.3+
 - Jest 30.2.0+ with ts-jest
 - ESLint 9.39.2+ with shaunburdick config
-- Node.js: Tests run on 18.x, 20.x, 22.x
+- Node.js: ^20.9.0 || >=22.0.0 (tests run on 20.x, 22.x)
 
 ## Git Workflow
 - **Main Branch**: `main` (not `master`)
@@ -164,5 +164,5 @@ Prefer `map`, `reduce`, `filter` over imperative loops for immutable transformat
 - The public API is minimal: one default export function with type exports
 - Maintain backward compatibility for minor versions
 - When adding features, update both the main function AND the TypeScript types
-- Test against all supported Node versions (18+, 20+, 22+)
+- Test against all supported Node versions (20+, 22+)
 - The package is published to npm; breaking changes require major version bump
