@@ -1,4 +1,4 @@
-import redact from '..';
+import redact from '../index';
 
 const testConfig = {
     foo: 'bar',

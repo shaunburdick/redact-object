@@ -34,7 +34,7 @@ function isKeywordMatch(keywords: string[], key: string, strict = false, partial
         const keyMatch = strict ? key : key.toLowerCase();
         const keywordMatch = strict ? keyword : keyword.toLowerCase();
 
-        return partial ? keyMatch.indexOf(keywordMatch) !== -1 : keyMatch === keywordMatch;
+        return partial ? keyMatch.includes(keywordMatch) : keyMatch === keywordMatch;
     });
 }
 
@@ -58,7 +58,7 @@ export default function redact(
     replaceVal?: string | ReplaceFunction,
     config?: ConfigOptions
 ): typeof target {
-    config = config || {};
+    config = config ?? {};
     const partial = Object.prototype.hasOwnProperty.call(config, 'partial') ? config.partial : true;
     const strict = Object.prototype.hasOwnProperty.call(config, 'strict') ? config.strict : true;
     const ignoreUnknown = Object.prototype.hasOwnProperty.call(config, 'ignoreUnknown') ? config.ignoreUnknown : false;
@@ -76,7 +76,7 @@ export default function redact(
                 const isMatch = isKeywordMatch(keywords, key, strict, partial);
                 if (isMatch) {
                     newObj[key] = typeof replaceVal === 'function'
-                        ? replaceVal(target[key], key) : replaceVal || '[ REDACTED ]';
+                        ? replaceVal(target[key], key) : (replaceVal ?? '[ REDACTED ]');
                 } else {
                     newObj[key] = redact(target[key], keywords, replaceVal, config);
                 }
@@ -86,7 +86,7 @@ export default function redact(
         );
     }
     // Redaction only works on arrays, plain objects, and primitives.
-    if (ignoreUnknown) {
+    if (ignoreUnknown === true) {
     // ignore the unknown type instead of throwing an error
         return target;
     } else {
