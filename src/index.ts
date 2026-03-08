@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import isPlainObject from 'lodash.isplainobject';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- used for flexibility in replace function
 export type ReplaceFunction = (value: any, key: string) => string;
 
 export interface ConfigOptions {
@@ -53,6 +53,7 @@ function isKeywordMatch(keywords: string[], key: string, strict = false, partial
  * @return            the new redacted object
  */
 export default function redact(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- used for flexibility in replace function
     target: any,
     keywords: string[],
     replaceVal?: string | ReplaceFunction,

@@ -6,7 +6,7 @@ const testConfig = {
         foo: 'bar'
     },
     derp: 'poo',
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+    // eslint-disable-next-line @typescript-eslint/naming-convention -- testing non-camel-case keys
     'auth-token': 'foo',
     array: [
         {
@@ -16,7 +16,7 @@ const testConfig = {
     ]
 };
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class -- used for testing non-plain objects
 class NonPlainObject {}
 
 const redactVal = '[ REDACTED ]';
