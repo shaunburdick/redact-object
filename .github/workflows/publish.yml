@@ -22,19 +22,41 @@
         publish:
             name: Publish Library
             needs: test
+            if: github.event_name == 'push' && github.ref_name == 'main'  # This condition limits the job to pushes to the main branch
             runs-on: ubuntu-latest
+            permissions:
+                id-token: write  # Required for OIDC
+                contents: read   # Required to checkout the repo
 
             steps:
-                - uses: actions/checkout@v4
-                - uses: actions/setup-node@v4
+                - uses: actions/checkout@v5
+                - uses: actions/setup-node@v5
                   with:
-                    node-version: 20
+                    node-version: 22
+                    registry-url: 'https://registry.npmjs.org'
+                - name: Update npm
+                  run: npm install -g npm@latest
                 - run: npm ci
-                - run: npm run build
-                - id: publish
-                  uses: JS-DevTools/npm-publish@v3
-                  with:
-                    token: ${{ secrets.NPM_TOKEN }}
-                - if: ${{ steps.publish.outputs.type }}
+                - name: Get package version
+                  id: package-version
+                  run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+                - name: Check if version exists on NPM
+                  id: version-check
                   run: |
-                    echo "Version changed! Published ${{ steps.publish.outputs.type }} version: ${{ steps.publish.outputs.id  }}"
+                    if npm view redact-object@${{ steps.package-version.outputs.version }} version 2>/dev/null; then
+                      echo "exists=true" >> $GITHUB_OUTPUT
+                    else
+                      echo "exists=false" >> $GITHUB_OUTPUT
+                    fi
+                - name: Publish to NPM
+                  if: steps.version-check.outputs.exists == 'false'
+                  run: |
+                    if [[ "${{ steps.package-version.outputs.version }}" == *"beta"* ]]; then
+                      npm publish --tag beta --provenance --access public
+                    else
+                      npm publish --provenance --access public
+                    fi
+                - name: Publish status
+                  if: steps.version-check.outputs.exists == 'false'
+                  run: |
+                    echo "Published version ${{ steps.package-version.outputs.version }} to NPM"
