@@ -39,7 +39,8 @@ npm run lint; echo "exit $?"
 `package.json` (`test`, `pretest`, `test:unit` scripts)
 
 Port every case in the deleted Jest file one-for-one, with the same assertions
-(eleven cases). Tests import `../dist/index.js`; the CommonJS check uses
+(eleven cases; the run reports twelve tests with the interop check). Tests
+import `../dist/index.js`; the CommonJS check uses
 `createRequire(import.meta.url)`, not `require()`. Scripts become
 `"test": "npm run lint && npm run test:unit"`, `"pretest": "npm run build"`,
 `"test:unit": "node --test"`; `jest`, `ts-jest` and `@types/jest` stay in
@@ -51,7 +52,8 @@ Port every case in the deleted Jest file one-for-one, with the same assertions
 npm test; echo "exit $?"
 # exit 0
 
-node --test --test-reporter=tap 2>&1 | grep '^# fail 0'
+node --test --test-reporter=tap 2>&1 | grep -E '^# (tests|fail) '
+# # tests 12
 # # fail 0
 ```
 
@@ -86,8 +88,8 @@ npm run build && ls dist
 npm test; echo "exit $?"
 # exit 0
 
-npm run lint:pkg 2>&1 | grep -cE 'All good!|No problems found'
-# 2
+npm run lint:pkg; echo "exit $?"
+# exit 0
 
 node -p "JSON.stringify(require('./package.json').exports['.'])"
 # {"types":"./dist/index.d.ts","require":"./dist/index.js","import":"./dist/index.js","default":"./dist/index.js"}
@@ -120,6 +122,9 @@ npm run build && npm run smoke:pack
 # pack-smoke: esm ok
 # pack-smoke: types ok
 # pack-smoke: ok
+
+npm run lint; echo "exit $?"
+# exit 0
 ```
 
 **Covers**: FR-008; AC-006.
@@ -158,13 +163,17 @@ jobs (see the plan's verification step 9).
 
 **Files**: `.github/workflows/publish.yml`
 
-Add a `package` job with the same four steps as T005's, and change the publish
+Give the `test` job the same `node-version: [20.x, 22.x, 24.x, 26.x]` matrix,
+add a `package` job with the same four steps as T005's, and change the publish
 job to `needs: [test, package]`. Keep the existing version-check and publish
 steps untouched.
 
 **Prove**:
 
 ```sh
+grep -c 'node-version: \[20.x, 22.x, 24.x, 26.x\]' .github/workflows/publish.yml
+# 1
+
 grep -c 'needs: \[test, package\]' .github/workflows/publish.yml
 # 1
 
@@ -184,8 +193,11 @@ grep -c 'npm run lint:pkg' .github/workflows/publish.yml
 README: keep the usage example and add the ESM import line beside the
 `require` line; add `## Migrating from 4.x` with the three facts (drop
 `.default`; types are reached as `redact.ConfigOptions` /
-`redact.ReplaceFunction`, and root-level named type imports still resolve;
-default imports need `esModuleInterop`, otherwise use `import = require`) and
+`redact.ReplaceFunction`, and root-level named type imports still resolve; a
+default import without `esModuleInterop` reports TS1259 in CJS resolution —
+with `allowSyntheticDefaultImports` it compiles to `.default(...)` and fails
+at runtime, while `nodenext` compiles and works — so enable `esModuleInterop`
+or use `import = require` when targeting CJS) and
 one line saying behaviour and options are unchanged. AGENTS.md: replace the
 Jest commands and testing conventions with `node:test` on `dist/`, list
 `npm run lint:pkg` and `npm run smoke:pack`, describe the `export =` shape and

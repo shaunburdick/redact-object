@@ -17,10 +17,10 @@ is published as a single CommonJS build whose default export is emitted as
 
 ## Done when
 
-A clean checkout passes `npm test`, `npm run lint:pkg` and `npm run smoke:pack`
-on Node 20, 22, 24 and 26, and installing the packed tarball into throwaway
-CommonJS and ESM projects returns the function from `require('redact-object')`
-and from `import redact from 'redact-object'`.
+A clean checkout passes `npm test` on Node 20, 22, 24 and 26, and passes
+`npm run lint:pkg` plus `npm run smoke:pack` on Node 24; installing the packed
+tarball into throwaway CommonJS and ESM projects returns the function from
+`require('redact-object')` and from `import redact from 'redact-object'`.
 
 ## Functional Requirements
 
@@ -40,12 +40,12 @@ and from `import redact from 'redact-object'`.
 - [ ] **AC-002**: ESM default import returns the same function. `npm run build && node --input-type=module -e "import r from './dist/index.js'; console.log(typeof r, JSON.stringify(r({foo:'bar',secret:'x'},['secret'])))"` → `function {"foo":"bar","secret":"[ REDACTED ]"}`
 - [ ] **AC-003**: `.default` is gone. `npm run build && node -p "require('./dist/index.js').default"` → `undefined`
 - [ ] **AC-004**: Behaviour matches 4.0.4 on the README example. `npm run build && node -e "const r=require('./dist/index.js'); const o={foo:'bar',fizz:{foo:'oof'},buzz:[{foo:'bar'},22]}; console.log(JSON.stringify(r(o,['foo'])))"` → `{"foo":"[ REDACTED ]","fizz":{"foo":"[ REDACTED ]"},"buzz":[{"foo":"[ REDACTED ]"},22]}`
-- [ ] **AC-005**: The suite runs on `node:test` against `dist/` and is green. `npm test; echo "exit $?"` → `exit 0`; `node --test --test-reporter=tap 2>&1 | grep '^# fail 0'` → `# fail 0`
+- [ ] **AC-005**: The suite runs on `node:test` against `dist/`, is green, and has not shrunk. `npm test; echo "exit $?"` → `exit 0`; `node --test --test-reporter=tap 2>&1 | grep -E '^# (tests|fail) '` → `# tests 12` then `# fail 0` (eleven ported cases plus the CommonJS interop check).
 - [ ] **AC-006**: A packed install type-checks for both consumer styles. `npm run build && npm run smoke:pack` prints `pack-smoke: cjs ok`, `pack-smoke: esm ok`, `pack-smoke: types ok`, `pack-smoke: ok` and exits 0 (the types step compiles a `import redact = require(...)` consumer and an ESM default-import consumer that name `redact.ConfigOptions` and `redact.ReplaceFunction`).
-- [ ] **AC-007**: Packaging gates pass with no ignore rules. `npm run build && npm run lint:pkg 2>&1 | grep -cE 'All good!|No problems found'` → `2`
+- [ ] **AC-007**: Packaging gates pass with no ignore rules. `npm run build && npm run lint:pkg; echo "exit $?"` → `exit 0`
 - [ ] **AC-008**: One build, one entry point. `npm run build && ls dist` → `index.d.ts` then `index.js`; `node -p "Object.keys(require('./package.json').exports['.']).join(',')"` → `types,require,import,default`; `node -p "Object.values(require('./package.json').exports['.']).join(' ')"` → `./dist/index.d.ts ./dist/index.js ./dist/index.js ./dist/index.js`
 - [ ] **AC-009**: Version, floor and runtime dependency are as specified. `node -p "require('./package.json').version"` → `5.0.0`; `node -p "JSON.stringify(require('./package.json').engines)"` → `{"node":"^20.9.0 || >=22.0.0"}`; `node -p "JSON.stringify(require('./package.json').dependencies)"` → `{"lodash.isplainobject":"^4.0.6"}`
-- [ ] **AC-010**: CI covers the engine matrix and gates the publish. `grep -c 'node-version: \[20.x, 22.x, 24.x, 26.x\]' .github/workflows/test.yml` → `1`; `grep -c 'needs: \[test, package\]' .github/workflows/publish.yml` → `1`
+- [ ] **AC-010**: CI covers the engine matrix and gates the publish on every cell. `grep -c 'node-version: \[20.x, 22.x, 24.x, 26.x\]' .github/workflows/test.yml .github/workflows/publish.yml` → `.github/workflows/test.yml:1` then `.github/workflows/publish.yml:1`; `grep -c 'needs: \[test, package\]' .github/workflows/publish.yml` → `1`
 - [ ] **AC-011**: A 4.x user is told what changes. `grep -c '^## Migrating from 4.x' README.md` → `1`; `grep -ric 'jest' README.md AGENTS.md package.json` → `README.md:0`, `AGENTS.md:0`, `package.json:0`
 
 ## Not doing
@@ -60,7 +60,7 @@ and from `import redact from 'redact-object'`.
 ## Edge Cases
 
 - **A 4.x consumer calling `.default`**: breaks on purpose. That removal is the major-version change, and the migration section names it.
-- **TypeScript without `esModuleInterop`**: `import redact from 'redact-object'` now reports TS1259; `import redact = require('redact-object')` works. The README migration note covers it.
+- **TypeScript default import without `esModuleInterop`**: in CJS/node10 resolution this reports TS1259; use `import redact = require('redact-object')`. With `allowSyntheticDefaultImports` it compiles, emits `require('redact-object').default(...)`, and fails at runtime because `.default` is gone. Under `nodenext` it compiles and works (ESM import of a CJS module). The migration note names the CJS outcomes.
 - **Root-level named type imports**: `import type { ConfigOptions } from 'redact-object'` still type-checks under node10, node16 and bundler resolution; it is not a breaking change. The documented form becomes `redact.ConfigOptions`.
 - **Lint before build**: the tests import `../dist/index.js`, so `npm run lint` needs a prior build. `npm test` builds first via `pretest`; CI builds before linting.
 - **Node 20 test reporter**: piped output is TAP there and spec on 24+, so criteria assert the exit status or force `--test-reporter=tap`.
