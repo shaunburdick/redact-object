@@ -15,9 +15,22 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      # One failing Node line should not cancel the others.
+      fail-fast: false
       matrix:
-        node-version: [20.9.0, 22.x, 24.x, 26.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        # eslint-plugin-unicorn (via eslint-config-shaunburdick) needs Node >= 20.10,
+        # so the 20.9.0 floor cell runs the build and tests without lint.
+        include:
+          - node-version: 20.9.0
+            script: test:unit
+          - node-version: 20.x
+            script: test
+          - node-version: 22.x
+            script: test
+          - node-version: 24.x
+            script: test
+          - node-version: 26.x
+            script: test
 
     steps:
     - uses: actions/checkout@v4
@@ -29,7 +42,7 @@ jobs:
         cache: 'npm'
 
     - run: npm ci
-    - run: npm test
+    - run: npm run ${{ matrix.script }}
 
   package:
 

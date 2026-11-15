@@ -162,7 +162,8 @@ Prefer `map`, `reduce`, `filter` over imperative loops for immutable transformat
 - `node:test` with `node:assert/strict` (no test framework dependency)
 - ESLint 9.39.2+ with shaunburdick config
 - publint and `@arethetypeswrong/cli` for the packed package
-- Node.js: ^20.9.0 || >=22.0.0 (tests run on 20.9.0, 22.x, 24.x, 26.x)
+- Node.js: ^20.9.0 || >=22.0.0 (tests run on 20.9.0, 20.x, 22.x, 24.x, 26.x)
+- The 20.9.0 cell runs the build and tests without lint: eslint-plugin-unicorn, pulled in by eslint-config-shaunburdick, needs Node >= 20.10
 
 ## Git Workflow
 - **Main Branch**: `main` (not `master`)
