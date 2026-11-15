@@ -10,9 +10,9 @@ This guide is for AI coding agents working in the redact-object repository. It c
 
 ### Core Commands
 ```bash
-npm test              # Run linting + unit tests (run this before commits)
-npm run test:unit     # Build, then run node:test against dist/
-npm run lint          # Check code with ESLint
+npm test              # Build, lint, then run the tests (run this before commits)
+npm run test:unit     # Build, then run node:test against dist/ (no lint)
+npm run lint          # Check code with ESLint; no build needed
 npm run lint:fix      # Auto-fix ESLint issues
 npm run lint:pkg      # Check the packed artefact with publint --strict and attw
 npm run build         # Clean and transpile src/index.ts to dist/
@@ -124,6 +124,7 @@ export function myFunction(paramName: string, optional?: boolean): ReturnType {
 - **Applies To**: JavaScript, TypeScript and `.mjs` files
 - **Ignores**: `dist/**`, `coverage/**`
 - **Namespaces**: `src/index.ts` allows declaration-only namespaces, which `export =` needs; a runtime namespace is still an error everywhere
+- **Generated imports**: in `test/`, `import/no-unresolved` ignores `../dist/` imports; the artefact exists only after a build and the test run proves the import resolves
 - **Never Disable Rules**: Fix code to comply with rules; don't disable linters inline unless absolutely necessary and documented
 
 ### Common Patterns in This Codebase

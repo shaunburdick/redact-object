@@ -23,6 +23,14 @@ export default [
         },
     },
     {
+        // Tests import the build output, which does not exist on a clean checkout.
+        // `npm test` builds before linting, and the test run proves the import resolves.
+        files: ['test/**/*.mjs'],
+        rules: {
+            'import/no-unresolved': ['error', { ignore: ['^\\.\\./dist/'] }],
+        },
+    },
+    {
         ignores: [
             'dist/**',
             'coverage/**'
