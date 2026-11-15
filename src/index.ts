@@ -1,17 +1,19 @@
 import isPlainObject from 'lodash.isplainobject';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- used for flexibility in replace function
-export type ReplaceFunction = (value: any, key: string) => string;
+declare namespace redact {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- used for flexibility in replace function
+    type ReplaceFunction = (value: any, key: string) => string;
 
-export interface ConfigOptions {
-    // do partial matches, default false
-    partial?: boolean;
+    interface ConfigOptions {
+        // do partial matches, default false
+        partial?: boolean;
 
-    // do strict key matching, default true
-    strict?: boolean;
+        // do strict key matching, default true
+        strict?: boolean;
 
-    // ignore unknown types instead of error, default false
-    ignoreUnknown?: boolean;
+        // ignore unknown types instead of error, default false
+        ignoreUnknown?: boolean;
+    }
 }
 
 // Yoinked from lodash to save dependencies
@@ -52,12 +54,12 @@ function isKeywordMatch(keywords: string[], key: string, strict = false, partial
  *                             }
  * @return            the new redacted object
  */
-export default function redact(
+function redact(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- used for flexibility in replace function
     target: any,
     keywords: string[],
-    replaceVal?: string | ReplaceFunction,
-    config?: ConfigOptions
+    replaceVal?: string | redact.ReplaceFunction,
+    config?: redact.ConfigOptions
 ): typeof target {
     config = config ?? {};
     const partial = Object.prototype.hasOwnProperty.call(config, 'partial') ? config.partial : true;
@@ -98,3 +100,5 @@ export default function redact(
         throw new Error(`Unsupported value type for redaction: ${targetType}`);
     }
 }
+
+export = redact;

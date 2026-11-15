@@ -15,6 +15,14 @@ export default [
         },
     },
     {
+        // `export =` can only carry types through a namespace, so the declaration is required here.
+        // Scoped to this file: a runtime namespace anywhere else is still an error.
+        files: ['src/index.ts'],
+        rules: {
+            '@typescript-eslint/no-namespace': ['error', { allowDeclarations: true }],
+        },
+    },
+    {
         ignores: [
             'dist/**',
             'jest.config.js',
