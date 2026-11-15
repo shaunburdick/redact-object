@@ -5,7 +5,7 @@
 
 ## Technical context
 
-- Node floor `^20.9.0 || >=22.0.0`; CI matrix 20.x, 22.x, 24.x, 26.x.
+- Node floor `^20.9.0 || >=22.0.0`; CI matrix 20.9.0, 22.x, 24.x, 26.x.
 - TypeScript 5.9.3, `target: es5`, `module: commonjs`, `strict`, `declaration`, `esModuleInterop`.
 - Build: `tsc` to `dist/`; published files are `dist/index.js` and `dist/index.d.ts`.
 - Lint: eslint 9 with `eslint-config-shaunburdick` 6.0.3 (same version as the sketch).
@@ -47,9 +47,9 @@ README.md, AGENTS.md               usage/migration; commands, testing, export sh
 | # | Decision | Alternatives rejected | Why |
 |---|---|---|---|
 | 1 | `function redact(...)` merged with `declare namespace redact` and `export = redact` | Document `.default` (does not fix #21); a separate `module.exports` interop export (needs ESM-only and Node 22.12) | Emits `module.exports = redact`; one artifact serves `require` and `import` on the current floor |
-| 2 | One CJS build, `exports` map with `types`/`require`/`import`/`default` all pointing at it | Dual ESM/CJS build | A single function gains nothing from two builds; dual layout doubles the type surface and the failure modes |
+| 2 | One CJS build, `"type": "commonjs"`, and an `exports` map with `types`/`require`/`import`/`default` all pointing at it | Dual ESM/CJS build | A single function gains nothing from two builds; dual layout doubles the type surface and the failure modes; `type` states the format and clears publint's suggestion for it |
 | 3 | `node:test` against `dist/` | Keep Jest + ts-jest (tests import `src/`, so the published artifact is never exercised); Vitest (extra dependency, same gap) | Removes three devDependencies and tests exactly what ships |
-| 4 | Packaging gates in a separate `package` CI job on Node 24; build/tests on 20/22/24/26 | Gates in every matrix cell (four tarball installs per run); no gates (#21 shipped because nothing checked the packed artifact) | Resolution and packaging do not vary by engine, so one cell is enough; the spec's *Done when* says Node 24 for these two commands, and the matrix still runs the tests on all four |
+| 4 | Packaging gates in a separate `package` CI job on Node 24; build/tests on 20.9.0/22/24/26 | Gates in every matrix cell (four tarball installs per run); no gates (#21 shipped because nothing checked the packed artifact) | Resolution and packaging do not vary by engine, so one cell is enough; the spec's *Done when* says Node 24 for these two commands, and the matrix still runs the tests on all four |
 | 5 | `main` + `types` + `files: [dist/index.js, dist/index.d.ts]`; `typings` replaced by `types` | Keeping both `types` and `typings` | `types` is the canonical field; same file, no consumer impact |
 | 6 | `test`: `npm run lint && npm run test:unit`, `pretest`: `npm run build`, `test:unit`: `node --test` | `node --test test/` (the sketch's script; fails on Node 24 with `MODULE_NOT_FOUND`); explicit file globs (shell-dependent on Windows) | Bare `--test` discovers `test/*.test.mjs` on Node 20 and later |
 | 7 | Drop `tsconfig.build.json`; `tsconfig.json` gains `files: ["src/index.ts"]` | Two configs that differ only by an `exclude` that matches nothing | One build config; the declaration and JS emit stay in `dist/` |
@@ -59,10 +59,10 @@ README.md, AGENTS.md               usage/migration; commands, testing, export sh
 
 `scripts/pack-smoke.mjs` and the two packaging devDependencies belong to the
 repository maintainer: a Dependabot bump that reddens either gate is fixed or
-pinned before the next publish, like a red test. Publish runs the 20/22/24/26
-matrix in its `test` job, so any red cell blocks the merge-triggered publish;
-`package` stays on Node 24 and `publish` needs both; a main push runs the
-matrix twice, the price of not publishing past a red cell.
+pinned before the next publish, like a red test. Publish runs the
+20.9.0/22/24/26 matrix in its `test` job, so any red cell blocks the
+merge-triggered publish; `package` stays on Node 24 and `publish` needs both;
+a main push runs the matrix twice, the price of not publishing past a red cell.
 
 ## Verified premises
 
@@ -108,9 +108,8 @@ binary.
 5. `npm run lint:pkg` → exit 0; publint `All good!`, attw `No problems found` with four green columns.
 6. `npm run smoke:pack` → `pack-smoke: cjs ok`, `esm ok`, `types ok`, `ok`.
 7. `npm pack --dry-run` → tarball holds `package.json`, `README.md`, `LICENSE`, `dist/index.js`, `dist/index.d.ts`, nothing else.
-8. `npm view redact-object@5.0.0 version` → no version (404); the publish workflow's own check repeats this.
-9. CI on the branch: `Test` workflow green on 20.x, 22.x, 24.x and 26.x, with the `package` job green.
-10. After merge: the `Publish` workflow's 20/22/24/26 `test` matrix and its `package` job pass before `publish`; then `npm install redact-object@5.0.0` in a temp directory and run the issue's `repro.cjs` and `repro.mjs` → `function` and `{ foo: 'bar', secret: '[ REDACTED ]' }` from both.
+8. CI on the branch: `Test` workflow green on 20.9.0, 22.x, 24.x and 26.x, with the `package` job green.
+9. After merge: the `Publish` workflow's 20.9.0/22/24/26 `test` matrix and its `package` job pass before `publish`; then `npm install redact-object@5.0.0` in a temp directory and run the issue's `repro.cjs` and `repro.mjs` → `function` and `{ foo: 'bar', secret: '[ REDACTED ]' }` from both.
 
 ## Rollback
 

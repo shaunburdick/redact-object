@@ -27,7 +27,7 @@ npm run lint; echo "exit $?"
 # exit 0
 ```
 
-**Covers**: FR-001, FR-002, FR-003, FR-004; AC-001, AC-002, AC-003.
+**Covers**: FR-001, FR-002, FR-003, FR-004; AC-001, AC-002, AC-003, AC-004.
 **Depends on**: nothing.
 
 ---
@@ -40,8 +40,8 @@ npm run lint; echo "exit $?"
 
 Port every case in the deleted Jest file one-for-one, with the same assertions
 (eleven cases; the run reports twelve tests with the interop check). Tests
-import `../dist/index.js`; the CommonJS check uses
-`createRequire(import.meta.url)`, not `require()`. Scripts become
+import `../dist/index.js`; `test/cjs-interop.test.mjs` holds exactly one test
+and uses `createRequire(import.meta.url)`, not `require()`. Scripts become
 `"test": "npm run lint && npm run test:unit"`, `"pretest": "npm run build"`,
 `"test:unit": "node --test"`; `jest`, `ts-jest` and `@types/jest` stay in
 `package.json` until T003.
@@ -95,7 +95,7 @@ node -p "JSON.stringify(require('./package.json').exports['.'])"
 # {"types":"./dist/index.d.ts","require":"./dist/index.js","import":"./dist/index.js","default":"./dist/index.js"}
 ```
 
-**Covers**: FR-003, FR-005, FR-006; AC-004, AC-007, AC-008, AC-009.
+**Covers**: FR-003, FR-005, FR-006; AC-007, AC-008, AC-009.
 **Depends on**: T001, T002.
 
 ---
@@ -136,7 +136,7 @@ npm run lint; echo "exit $?"
 
 **Files**: `.github/workflows/test.yml`
 
-Set the matrix to `node-version: [20.x, 22.x, 24.x, 26.x]` and keep checkout,
+Set the matrix to `node-version: [20.9.0, 22.x, 24.x, 26.x]` and keep checkout,
 setup-node with npm cache, `npm ci`, `npm run build`, `npm test` per cell. Add
 a `package` job on Node 24.x running `npm ci`, `npm run build`,
 `npm run lint:pkg`, `npm run smoke:pack`.
@@ -144,7 +144,7 @@ a `package` job on Node 24.x running `npm ci`, `npm run build`,
 **Prove**:
 
 ```sh
-grep -c 'node-version: \[20.x, 22.x, 24.x, 26.x\]' .github/workflows/test.yml
+grep -c 'node-version: \[20.9.0, 22.x, 24.x, 26.x\]' .github/workflows/test.yml
 # 1
 
 grep -c 'npm run smoke:pack' .github/workflows/test.yml
@@ -152,7 +152,7 @@ grep -c 'npm run smoke:pack' .github/workflows/test.yml
 ```
 
 The authoritative proof is the workflow run on this branch, green in both
-jobs (see the plan's verification step 9).
+jobs (see the plan's verification step 8).
 
 **Covers**: FR-007, FR-008; AC-010.
 **Depends on**: T003, T004.
@@ -163,7 +163,7 @@ jobs (see the plan's verification step 9).
 
 **Files**: `.github/workflows/publish.yml`
 
-Give the `test` job the same `node-version: [20.x, 22.x, 24.x, 26.x]` matrix,
+Give the `test` job the same `node-version: [20.9.0, 22.x, 24.x, 26.x]` matrix,
 add a `package` job with the same four steps as T005's, and change the publish
 job to `needs: [test, package]`. Keep the existing version-check and publish
 steps untouched.
@@ -171,7 +171,7 @@ steps untouched.
 **Prove**:
 
 ```sh
-grep -c 'node-version: \[20.x, 22.x, 24.x, 26.x\]' .github/workflows/publish.yml
+grep -c 'node-version: \[20.9.0, 22.x, 24.x, 26.x\]' .github/workflows/publish.yml
 # 1
 
 grep -c 'needs: \[test, package\]' .github/workflows/publish.yml
