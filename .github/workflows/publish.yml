@@ -13,19 +13,17 @@
                 # One failing Node line should not cancel the others.
                 fail-fast: false
                 matrix:
-                    # eslint-plugin-unicorn (via eslint-config-shaunburdick) needs Node >= 20.10,
-                    # so the 20.9.0 floor cell runs the build and tests without lint.
+                    # Lint runs once, on 24.x, because its result does not depend on the runtime;
+                    # the tests run on every version because they do.
                     include:
-                        - node-version: 20.9.0
-                          script: test:unit
                         - node-version: 20.x
-                          script: test
+                          script: test:unit
                         - node-version: 22.x
-                          script: test
+                          script: test:unit
                         - node-version: 24.x
                           script: test
                         - node-version: 26.x
-                          script: test
+                          script: test:unit
 
             steps:
                 - uses: actions/checkout@v4
