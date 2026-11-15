@@ -25,7 +25,6 @@ export default [
     {
         ignores: [
             'dist/**',
-            'jest.config.js',
             'coverage/**'
         ],
     }

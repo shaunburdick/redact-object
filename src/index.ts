@@ -5,7 +5,7 @@ declare namespace redact {
     type ReplaceFunction = (value: any, key: string) => string;
 
     interface ConfigOptions {
-        // do partial matches, default false
+        // do partial matches, default true
         partial?: boolean;
 
         // do strict key matching, default true
@@ -48,7 +48,7 @@ function isKeywordMatch(keywords: string[], key: string, strict = false, partial
  * @param  replaceVal Optional custom replace value or function replacer
  * @param  config     Optional config
  *                             {
- *                               partial: boolean, do partial matches, default false
+ *                               partial: boolean, do partial matches, default true
  *                               strict: boolean, do strict key matching, default true
  *                               ignoreUnknown: boolean, ignore unknown types instead of error, default false
  *                             }

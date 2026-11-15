@@ -103,6 +103,9 @@ const redacted = redact(obj, ['firstname', 'lastname'], replacer);
   `import type { ConfigOptions } from 'redact-object'` keeps working.
 - A default import needs `esModuleInterop`. Without it, use
   `import redact = require('redact-object')` in TypeScript.
+- Deep imports into `dist/`, such as `redact-object/dist/index.js`, no longer
+  resolve; the `exports` map exposes only the package root and its
+  `package.json`.
 
 The case that bites: with `esModuleInterop` off and
 `allowSyntheticDefaultImports` on, `import redact from 'redact-object'`

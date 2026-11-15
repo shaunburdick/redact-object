@@ -11,7 +11,8 @@
       "require": "./dist/index.js",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "files": [
     "dist/index.js",
@@ -22,7 +23,7 @@
     "test:unit": "npm run build && node --test",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "lint:pkg": "publint --strict && attw --pack .",
+    "lint:pkg": "npm run build && publint --strict && attw --pack .",
     "build": "npm run build:clean && npm run build:transpile",
     "build:clean": "rimraf dist/*",
     "build:transpile": "tsc --project tsconfig.json",
