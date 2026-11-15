@@ -1,21 +1,32 @@
 {
   "name": "redact-object",
-  "version": "4.0.4",
+  "version": "5.0.0",
   "description": "Object redactor",
+  "type": "commonjs",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "files": [
     "dist/index.js",
     "dist/index.d.ts"
   ],
-  "typings": "dist/index.d.ts",
   "scripts": {
     "test": "npm run lint && npm run test:unit",
     "test:unit": "npm run build && node --test",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
+    "lint:pkg": "publint --strict && attw --pack .",
     "build": "npm run build:clean && npm run build:transpile",
     "build:clean": "rimraf dist/*",
-    "build:transpile": "tsc --project tsconfig.build.json"
+    "build:transpile": "tsc --project tsconfig.json",
+    "smoke:pack": "npm run build && node scripts/pack-smoke.mjs"
   },
   "repository": {
     "type": "git",
@@ -36,15 +47,14 @@
     "node": "^20.9.0 || >=22.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
+    "@arethetypeswrong/cli": "^0.18.5",
     "@types/lodash.isplainobject": "^4.0.9",
     "@types/node": "^25.0.3",
     "eslint": "^9.39.2",
     "eslint-config-shaunburdick": "^6.0.2",
     "eslint-import-resolver-typescript": "^4.4.4",
-    "jest": "^30.2.0",
+    "publint": "^0.3.25",
     "rimraf": "^6.1.2",
-    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3"
   },
   "homepage": "https://github.com/shaunburdick/redact-object",
