@@ -9,19 +9,37 @@
         test:
             name: Test Package
             runs-on: ubuntu-latest
+            strategy:
+                matrix:
+                    node-version: [20.9.0, 22.x, 24.x, 26.x]
+
+            steps:
+                - uses: actions/checkout@v4
+                - name: Use Node.js ${{ matrix.node-version }}
+                  uses: actions/setup-node@v4
+                  with:
+                      node-version: ${{ matrix.node-version }}
+                - run: npm ci
+                - run: npm test
+
+        package:
+            name: Check Package
+            runs-on: ubuntu-latest
 
             steps:
                 - uses: actions/checkout@v4
                 - name: Use Node.js
                   uses: actions/setup-node@v4
                   with:
-                      node-version: 20
+                      node-version: 24.x
                 - run: npm ci
-                - run: npm test
+                - run: npm run build
+                - run: npm run lint:pkg
+                - run: npm run smoke:pack
 
         publish:
             name: Publish Library
-            needs: test
+            needs: [test, package]
             if: github.event_name == 'push' && github.ref_name == 'main'  # This condition limits the job to pushes to the main branch
             runs-on: ubuntu-latest
             permissions:
