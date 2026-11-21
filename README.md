@@ -8,9 +8,19 @@ A javascript object redactor. So I like to output any configurations when my app
 
 Pass in an object and an array of members you want to redact. It will recursively travel the object redacting any matching members.
 
+From CommonJS:
+
 ```javascript
 const redact = require('redact-object');
+```
 
+From ES modules:
+
+```javascript
+import redact from 'redact-object';
+```
+
+```javascript
 var obj = {
   foo: 'bar',
   fizz: {
@@ -80,6 +90,27 @@ const redacted = redact(obj, ['firstname', 'lastname'], replacer);
  * };
  */
 ```
+
+## Migrating from 4.x
+
+5.0.0 changes only how the module is exported. Redaction behaviour, the
+`[ REDACTED ]` default and every option are unchanged.
+
+- `require('redact-object')` returns the function now. `.default` is gone, so
+  `require('redact-object').default(...)` becomes `require('redact-object')(...)`.
+- The types are reached through the function: `redact.ConfigOptions` and
+  `redact.ReplaceFunction`. Root-level named type imports still resolve, so
+  `import type { ConfigOptions } from 'redact-object'` keeps working.
+- A default import needs `esModuleInterop`. Without it, use
+  `import redact = require('redact-object')` in TypeScript.
+- Deep imports into `dist/`, such as `redact-object/dist/index.js`, no longer
+  resolve; the `exports` map exposes only the package root and its
+  `package.json`.
+
+The case that bites: with `esModuleInterop` off and
+`allowSyntheticDefaultImports` on, `import redact from 'redact-object'`
+type-checks and emits `redact.default(...)`, which throws at runtime. Turn on
+`esModuleInterop` or switch to `import = require` before upgrading.
 
 ## Contributing
 

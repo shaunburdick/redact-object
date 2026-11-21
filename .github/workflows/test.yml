@@ -15,9 +15,20 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      # One failing Node line should not cancel the others.
+      fail-fast: false
       matrix:
-        node-version: [20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        # Lint runs once, on 24.x, because its result does not depend on the runtime;
+        # the tests run on every version because they do.
+        include:
+          - node-version: 20.x
+            script: test:unit
+          - node-version: 22.x
+            script: test:unit
+          - node-version: 24.x
+            script: test
+          - node-version: 26.x
+            script: test:unit
 
     steps:
     - uses: actions/checkout@v4
@@ -29,6 +40,22 @@ jobs:
         cache: 'npm'
 
     - run: npm ci
-    - run: npm run build
+    - run: npm run ${{ matrix.script }}
 
-    - run: npm test
+  package:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 24.x
+        cache: 'npm'
+
+    - run: npm ci
+    - run: npm run build
+    - run: npm run lint:pkg
+    - run: npm run smoke:pack
