@@ -20,6 +20,8 @@ const testConfig = {
 
 const redactVal = '[ REDACTED ]';
 
+const func = () => 'not redacted';
+
 describe('Redact Config', () => {
     it('should redact values of foo', () => {
         const redacted = redact(testConfig, ['foo']);
@@ -85,7 +87,6 @@ describe('Redact Config', () => {
     });
 
     it('should not throw with function and `ignoreUnknown` is true', () => {
-        const func = () => undefined;
         const redacted = redact(func, ['FOO'], 'REDACTED', {
             ignoreUnknown: true
         });

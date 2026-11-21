@@ -27,17 +27,27 @@ function isObject(value: unknown): value is Record<string, unknown> {
  *
  * @param  keywords A list of keywords to look for
  * @param  key      The string to check
- * @param  strict   Use strict case if true
- * @param  partial  Use partial matching if true
+ * @param  isStrict Use strict case if true
+ * @param  isPartial Use partial matching if true
  * @return          True for match or false
  */
-function isKeywordMatch(keywords: string[], key: string, strict = false, partial = false): boolean {
+function isKeywordMatch(keywords: string[], key: string, isStrict = false, isPartial = false): boolean {
     return keywords.some(keyword => {
-        const keyMatch = strict ? key : key.toLowerCase();
-        const keywordMatch = strict ? keyword : keyword.toLowerCase();
+        const keyMatch = isStrict ? key : key.toLowerCase();
+        const keywordMatch = isStrict ? keyword : keyword.toLowerCase();
 
-        return partial ? keyMatch.includes(keywordMatch) : keyMatch === keywordMatch;
+        return isPartial ? keyMatch.includes(keywordMatch) : keyMatch === keywordMatch;
     });
+}
+
+function resolveConfig(config: redact.ConfigOptions = {}): redact.ConfigOptions {
+    const resolved: redact.ConfigOptions = { partial: true, strict: true, ignoreUnknown: false };
+    for (const key of ['partial', 'strict', 'ignoreUnknown'] as const) {
+        if (Object.prototype.hasOwnProperty.call(config, key)) {
+            resolved[key] = config[key];
+        }
+    }
+    return resolved;
 }
 
 /**
@@ -61,44 +71,38 @@ function redact(
     replaceVal?: string | redact.ReplaceFunction,
     config?: redact.ConfigOptions
 ): typeof target {
-    config = config ?? {};
-    const partial = Object.prototype.hasOwnProperty.call(config, 'partial') ? config.partial : true;
-    const strict = Object.prototype.hasOwnProperty.call(config, 'strict') ? config.strict : true;
-    const ignoreUnknown = Object.prototype.hasOwnProperty.call(config, 'ignoreUnknown') ? config.ignoreUnknown : false;
+    const { partial, strict, ignoreUnknown } = resolveConfig(config);
 
     if (!isObject(target)) {
     // If it's not an object then it's a primitive. Nothing to redact.
         return target;
-    } else if (Array.isArray(target)) {
+    }
+    if (Array.isArray(target)) {
     // Create a new array with each value having been redacted
     // Redact each value of the array.
         return target.map(val => redact(val, keywords, replaceVal, config));
-    } else if (isPlainObject(target)) {
-        return Object.keys(target).reduce(
-            (newObj, key) => {
-                const isMatch = isKeywordMatch(keywords, key, strict, partial);
-                if (isMatch) {
-                    newObj[key] = typeof replaceVal === 'function'
-                        ? replaceVal(target[key], key) : (replaceVal ?? '[ REDACTED ]');
-                } else {
-                    newObj[key] = redact(target[key], keywords, replaceVal, config);
-                }
-                return newObj;
-            },
-            ({} as typeof target)
-        );
+    }
+    if (isPlainObject(target)) {
+        const entries = Object.entries(target).map(([key, value]) => {
+            if (isKeywordMatch(keywords, key, strict, partial)) {
+                const replacement = typeof replaceVal === 'function'
+                    ? replaceVal(value, key) : (replaceVal ?? '[ REDACTED ]');
+                return [key, replacement] as const;
+            }
+            return [key, redact(value, keywords, replaceVal, config)] as const;
+        });
+        return Object.fromEntries(entries) as typeof target;
     }
     // Redaction only works on arrays, plain objects, and primitives.
     if (ignoreUnknown === true) {
     // ignore the unknown type instead of throwing an error
         return target;
-    } else {
-        let targetType = typeof target;
-        if (targetType === 'object' && !isPlainObject(target)) {
-            targetType += ' (not plain)';
-        }
-        throw new Error(`Unsupported value type for redaction: ${targetType}`);
     }
+    let targetType = typeof target;
+    if (targetType === 'object' && !isPlainObject(target)) {
+        targetType += ' (not plain)';
+    }
+    throw new Error(`Unsupported value type for redaction: ${targetType}`);
 }
 
 export = redact;
