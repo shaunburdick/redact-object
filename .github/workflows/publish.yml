@@ -56,7 +56,7 @@
             runs-on: ubuntu-latest
             permissions:
                 id-token: write  # Required for OIDC
-                contents: read   # Required to checkout the repo
+                contents: write  # Required to create the GitHub Release
 
             steps:
                 - uses: actions/checkout@v5
@@ -91,3 +91,16 @@
                   if: steps.version-check.outputs.exists == 'false'
                   run: |
                     echo "Published version ${{ steps.package-version.outputs.version }} to NPM"
+                # Deliberate: this step runs even when the npm publish step above was skipped.
+                # A re-run can find the version already on npm but its release missing because
+                # the earlier run died in between, and that release still has to be created.
+                - name: Create GitHub Release
+                  env:
+                      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  run: |
+                    VERSION="${{ steps.package-version.outputs.version }}"
+                    if gh release view "v$VERSION" > /dev/null 2>&1; then
+                      echo "Release v$VERSION already exists; nothing to do."
+                      exit 0
+                    fi
+                    gh release create "v$VERSION" --title "v$VERSION" --generate-notes --target "$GITHUB_SHA"
