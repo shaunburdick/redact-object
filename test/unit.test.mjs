@@ -1,4 +1,7 @@
-import redact from '../index';
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+
+import redact from '../dist/index.js';
 
 const testConfig = {
     foo: 'bar',
@@ -6,7 +9,6 @@ const testConfig = {
         foo: 'bar'
     },
     derp: 'poo',
-    // eslint-disable-next-line @typescript-eslint/naming-convention -- testing non-camel-case keys
     'auth-token': 'foo',
     array: [
         {
@@ -16,18 +18,17 @@ const testConfig = {
     ]
 };
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class -- used for testing non-plain objects
-class NonPlainObject {}
-
 const redactVal = '[ REDACTED ]';
+
+const func = () => 'not redacted';
 
 describe('Redact Config', () => {
     it('should redact values of foo', () => {
         const redacted = redact(testConfig, ['foo']);
-        expect(redacted.foo).toEqual(redactVal);
-        expect(redacted.fizz.foo).toEqual(redactVal);
-        expect(Array.isArray(redacted.array)).toBe(true);
-        expect(redacted.array).toEqual([
+        assert.equal(redacted.foo, redactVal);
+        assert.equal(redacted.fizz.foo, redactVal);
+        assert.equal(Array.isArray(redacted.array), true);
+        assert.deepEqual(redacted.array, [
             {
                 foo: redactVal
             },
@@ -37,24 +38,24 @@ describe('Redact Config', () => {
 
     it('should not redact unmatched keys', () => {
         const redacted = redact(testConfig, ['no-match']);
-        expect(redacted).toEqual(testConfig);
+        assert.deepEqual(redacted, testConfig);
     });
 
     it('should use a custom value', () => {
         const customVal = 'poop';
         const redacted = redact(testConfig, ['foo'], customVal);
-        expect(redacted.foo).toEqual(customVal);
+        assert.equal(redacted.foo, customVal);
     });
 
     it('should not alter original object', () => {
         const origValue = testConfig.foo;
         redact(testConfig, ['foo']);
-        expect(testConfig.foo).toEqual(origValue);
+        assert.equal(testConfig.foo, origValue);
     });
 
     it('should match partial strings', () => {
         const redacted = redact(testConfig, ['token']);
-        expect(redacted['auth-token']).toEqual(redactVal);
+        assert.equal(redacted['auth-token'], redactVal);
     });
 
     it('should not match partial strings if configured', () => {
@@ -62,40 +63,38 @@ describe('Redact Config', () => {
         const redacted = redact(testConfig, ['token'], redactVal, {
             partial: false
         });
-        expect(redacted['auth-token']).toEqual(origValue);
+        assert.equal(redacted['auth-token'], origValue);
     });
 
     it('should be case-sensitive', () => {
         const origValue = testConfig.foo;
         const redacted = redact(testConfig, ['FOO']);
-        expect(redacted.foo).toEqual(origValue);
+        assert.equal(redacted.foo, origValue);
     });
 
     it('should be case-insensitive if configured', () => {
         const redacted = redact(testConfig, ['FOO'], redactVal, {
             strict: false
         });
-        expect(redacted.foo).toEqual(redactVal);
-        expect(redacted.fizz.foo).toEqual(redactVal);
+        assert.equal(redacted.foo, redactVal);
+        assert.equal(redacted.fizz.foo, redactVal);
     });
 
     it('should throw with non-plain object', () => {
-        expect(() => {
-            const nonPlainObject = new NonPlainObject();
-            redact(nonPlainObject, ['FOO']);
-        }).toThrow('Unsupported value type for redaction: object (not plain)');
+        assert.throws(() => {
+            redact(new Map(), ['FOO']);
+        }, { message: 'Unsupported value type for redaction: object (not plain)' });
     });
 
     it('should not throw with function and `ignoreUnknown` is true', () => {
-        const func = () => undefined;
         const redacted = redact(func, ['FOO'], 'REDACTED', {
             ignoreUnknown: true
         });
-        expect(redacted).toEqual(func);
+        assert.equal(redacted, func);
     });
 
     it('should accept a function to replace value', () => {
         const redacted = redact(testConfig, ['foo'], (value, key) => `Redacted ${key} (${value.length})`);
-        expect(redacted.foo).toEqual('Redacted foo (3)');
+        assert.equal(redacted.foo, 'Redacted foo (3)');
     });
 });
